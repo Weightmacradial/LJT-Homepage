@@ -1,0 +1,52 @@
+name: Deploy static build to gh-pages branch
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1.328.0
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: gh-pages
+      - name: Install UglifyJS
+        run: npm install -g uglify-js
+      - name: Minify JS files
+        run: uglifyjs assets/js/plugins/jquery.greedy-navigation.js assets/js/_main.js assets/js/theme.js -c -m -o assets/js/main.min.js
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "/LJT-Homepage"
+        env:
+          JEKYLL_ENV: production
+      - name: Publish build to gh-pages branch
+        run: |
+          set -euo pipefail
+          touch _site/.nojekyll
+          git worktree add ../deploy-site master
+          cd ../deploy-site
+          git checkout --orphan gh-pages
+          git rm -rf .
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a ../LJT-Homepage/_site/. .
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Deploy LJT-Homepage static build"
+          git push origin HEAD:gh-pages
+      - name: Poll project Pages URL
+        run: |
+          for i in $(seq 1 18); do
+            code=$(curl -L -s -o /tmp/ljt-home.html -w '%{http_code}' "https://weightmacradial.github.io/LJT-Homepage/" || true)
+            echo "Attempt $i: HTTP $code"
+            if [ "$code" = "200" ] && grep -q "Junteng Liu" /tmp/ljt-home.html; then
+              echo "Site is live and contains the profile."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Pages URL was not serving the build during the poll window."
