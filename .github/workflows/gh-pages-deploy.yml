@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           touch _site/.nojekyll
-          git worktree add ../deploy-site master
+          git worktree add --detach ../deploy-site HEAD
           cd ../deploy-site
           git checkout --orphan gh-pages
           git rm -rf .
