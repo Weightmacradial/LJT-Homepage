@@ -55,12 +55,14 @@ exclude:
   - .github
   - .jekyll-assets-cache
   - .sass-cache
+  - AGENTS.md
   - assets/js/_main.js
   - assets/js/plugins
   - assets/js/vendor
   - CHANGELOG
   - Capfile
   - config
+  - _config_docker.yml
   - Dockerfile
   - docker-compose.yaml
   - files
