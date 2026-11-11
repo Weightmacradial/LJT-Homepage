@@ -2,7 +2,7 @@
 title: "SynLogic: Synthesizing Verifiable Reasoning Data at Scale for Learning Logical Reasoning and Beyond"
 collection: publications
 permalink: /publications/synlogic/
-date: "2025"
+date: "2025-01-01"
 venue: "Arxiv"
 excerpt: >-
   First-author paper published on Arxiv in 2025. A GitHub code repository is available.
